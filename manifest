@@ -1,0 +1,17 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 0.1
+description: My module
+author: Your Name
+license: Specify your license
+copyright: Copyright (c) 2010 by Your Company
+
+
+# these should not be edited
+name: cashola
+moduleid: com.cashola
+guid: 05bfcd62-0c1c-4c57-81c7-f72a6d125ced
+platform: iphone
+minsdk: 1.6.2

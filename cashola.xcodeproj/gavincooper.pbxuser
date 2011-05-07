@@ -1,0 +1,194 @@
+// !$*UTF8*$!
+{
+	0867D690FE84028FC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeTarget = D2AAC07D0554694100DB518D /* cashola */;
+		addToTargets = (
+			D2AAC07D0554694100DB518D /* cashola */,
+		);
+		codeSenseManager = BA2B23ED13758BDA00A0B374 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					981,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 326479259;
+			PBXWorkspaceStateSaveDate = 326479259;
+		};
+		perUserProjectItems = {
+			BA2B24111375909900A0B374 = BA2B24111375909900A0B374 /* PBXTextBookmark */;
+			BA2B24131375909900A0B374 = BA2B24131375909900A0B374 /* PBXTextBookmark */;
+			BA2B2420137591DD00A0B374 = BA2B2420137591DD00A0B374 /* PBXTextBookmark */;
+			BAFC486D1375A7CE00C66898 = BAFC486D1375A7CE00C66898 /* PBXTextBookmark */;
+			BAFC48701375A8A300C66898 = BAFC48701375A8A300C66898 /* PBXTextBookmark */;
+			BAFC48711375A8A300C66898 = BAFC48711375A8A300C66898 /* PBXTextBookmark */;
+			BAFC48A21375AD8500C66898 = BAFC48A21375AD8500C66898 /* PBXTextBookmark */;
+		};
+		sourceControlManager = BA2B23EC13758BDA00A0B374 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	24416B8111C4CA220047AFDD /* Build & Test */ = {
+		activeExec = 0;
+	};
+	24DD6CF71134B3F500162E58 /* ComCasholaModule.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1159, 700}}";
+			sepNavSelRange = "{298, 25}";
+			sepNavVisRange = "{0, 425}";
+		};
+	};
+	24DD6CF81134B3F500162E58 /* ComCasholaModule.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1884, 3268}}";
+			sepNavSelRange = "{4782, 0}";
+			sepNavVisRange = "{4212, 260}";
+			sepNavWindowFrame = "{{15, 45}, {750, 833}}";
+		};
+	};
+	24DE9E0F11C5FE74003F90F6 /* ComCasholaModuleAssets.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1171, 700}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 158}";
+		};
+	};
+	24DE9E1011C5FE74003F90F6 /* ComCasholaModuleAssets.m */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1171, 700}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 260}";
+		};
+	};
+	BA2B23EC13758BDA00A0B374 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	BA2B23ED13758BDA00A0B374 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	BA2B24011375903900A0B374 /* SKProduct+LocalizedPrice.h */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.h;
+		name = "SKProduct+LocalizedPrice.h";
+		path = "/Library/WebServer/Documents/TiModules/Cashola/SKProduct+LocalizedPrice.h";
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1171, 700}}";
+			sepNavSelRange = "{257, 0}";
+			sepNavVisRange = "{0, 328}";
+		};
+	};
+	BA2B24021375903900A0B374 /* SKProduct+LocalizedPrice.m */ = {
+		isa = PBXFileReference;
+		fileEncoding = 4;
+		lastKnownFileType = sourcecode.c.objc;
+		name = "SKProduct+LocalizedPrice.m";
+		path = "/Library/WebServer/Documents/TiModules/Cashola/SKProduct+LocalizedPrice.m";
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1159, 700}}";
+			sepNavSelRange = "{240, 14}";
+			sepNavVisRange = "{0, 671}";
+		};
+	};
+	BA2B24111375909900A0B374 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 24DE9E1011C5FE74003F90F6 /* ComCasholaModuleAssets.m */;
+		name = "ComCasholaModuleAssets.m: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 260;
+		vrLoc = 0;
+	};
+	BA2B24131375909900A0B374 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 24DE9E0F11C5FE74003F90F6 /* ComCasholaModuleAssets.h */;
+		name = "ComCasholaModuleAssets.h: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 158;
+		vrLoc = 0;
+	};
+	BA2B2420137591DD00A0B374 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = BA2B24011375903900A0B374 /* SKProduct+LocalizedPrice.h */;
+		name = "SKProduct+LocalizedPrice.h: 12";
+		rLen = 0;
+		rLoc = 257;
+		rType = 0;
+		vrLen = 328;
+		vrLoc = 0;
+	};
+	BAFC486D1375A7CE00C66898 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = BA2B24021375903900A0B374 /* SKProduct+LocalizedPrice.m */;
+		name = "SKProduct+LocalizedPrice.m: 14";
+		rLen = 14;
+		rLoc = 240;
+		rType = 0;
+		vrLen = 671;
+		vrLoc = 0;
+	};
+	BAFC48701375A8A300C66898 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 24DD6CF71134B3F500162E58 /* ComCasholaModule.h */;
+		name = "ComCasholaModule.h: 12";
+		rLen = 25;
+		rLoc = 298;
+		rType = 0;
+		vrLen = 425;
+		vrLoc = 0;
+	};
+	BAFC48711375A8A300C66898 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 24DD6CF81134B3F500162E58 /* ComCasholaModule.m */;
+		name = "ComCasholaModule.m: 14";
+		rLen = 0;
+		rLoc = 333;
+		rType = 0;
+		vrLen = 683;
+		vrLoc = 0;
+	};
+	BAFC48A21375AD8500C66898 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 24DD6CF81134B3F500162E58 /* ComCasholaModule.m */;
+		name = "ComCasholaModule.m: 146";
+		rLen = 0;
+		rLoc = 3556;
+		rType = 0;
+		vrLen = 1294;
+		vrLoc = 3105;
+	};
+	D2AAC07D0554694100DB518D /* cashola */ = {
+		activeExec = 0;
+	};
+}
