@@ -1,5 +1,7 @@
 # Cashola #
 
+### THIS IS IN NO WAY PRODUCTION READY ###
+
 #### Still in dev. ####
 
 Open source and free In-App Purchase module for Titanium. Works on iOS at the moment.
