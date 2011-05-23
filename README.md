@@ -67,6 +67,7 @@ Find out how to test in Objective-C.
 Find out a decent way of testing in Titanium.
 
 ## In The Works ##
+UI Theme Support - or a way to override constructors for elements.
 Android Support (via PayPal)
 Blackberry? (maybe via PayPal SDK or using a browser and PayPal express checkout)
 
