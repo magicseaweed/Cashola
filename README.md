@@ -63,6 +63,11 @@ Cashola's checkout experience works simliar to PayPal Express.
 	
 The UI to view your store and purchase a product is sorted out for you by Cashola. `win` is called each time a product is purchased.
 
+## WTF? It's not working? ##
+
+#### 1. I don't get a response from Cashola.getProducts(), explain? ####
+Have you checked you are passing it the correct product identifiers? No response is given by Apple's StoreKit if you pass it something invalid, it will just "not work". If you are passing it the correct product indentifier(s), how recently did you add those products? If it was within the last 24 hours then it's a good idea to leave it for a day and come back to it, sometimes StoreKit takes a will to respond to new products. Failing all that checkout this list of common problems, from the good folks at el'Apple http://developer.apple.com/library/ios/#technotes/tn2259/_index.html
+
 ## Tests ##
 
 Find out how to test in Objective-C.

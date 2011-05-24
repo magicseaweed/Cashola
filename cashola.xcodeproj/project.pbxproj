@@ -234,6 +234,7 @@
 				GCC_PREFIX_HEADER = ComCashola_Prefix.pch;
 				INSTALL_PATH = /usr/local/lib;
 				PRODUCT_NAME = ComCashola;
+				SDKROOT = iphoneos4.2;
 			};
 			name = Debug;
 		};
@@ -264,7 +265,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.0;
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
-				SDKROOT = iphoneos4.1;
+				SDKROOT = iphoneos;
 			};
 			name = Debug;
 		};

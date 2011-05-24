@@ -22,12 +22,14 @@ cashola.getProducts({
 	}
 });
 */
+/*
 cashola.getProducts({
 	identifiers: ["foo", "and", "bar"],
 	win: function (e) {
 		Ti.API.debug("Second test");
 	}
 });
+*/
 /*
 cashola.makePurchase({
 	
