@@ -9,15 +9,15 @@ Open source and free In-App Purchase module for Titanium. Works on iOS at the mo
 ## Installation ##
 
 1. Open the Terminal
+
 2. Run
-	python build.py && unzip com.cashola-iphone-0.1.zip -d /Library/Application\ Support/Titanium/
-2.a. If the last line of the output for the above command was
-	ImportError: No module named markdown
-Then you either need to install the python markdown module or just run below, to finish off the install.
-	unzip com.cashola-iphone-0.1.zip -d /Library/Application\ Support/Titanium/
+`python build.py && unzip com.cashola-iphone-0.1.zip -d /Library/Application\ Support/Titanium/`
+
+3. If the last line of the output for the above command was `ImportError: No module named markdown` Then you either need to install the python markdown module or just run below, to finish off the install.
+`unzip com.cashola-iphone-0.1.zip -d /Library/Application\ Support/Titanium/`
 
 3. Register the module in your app, by opening your app's `tiapi.xml` and adding the below element to `<modules>`
-	<module version="0.1">com.cashola</module>
+`<module version="0.1">com.cashola</module>`
 
 ## Using the API ##
 
@@ -70,8 +70,8 @@ The UI to view your store and purchase a product is sorted out for you by Cashol
 ## WTF? It's not working? ##
 
 #### 1. I don't get a response from Cashola.getProducts(), explain? ####
-Have you checked you are passing it the correct product identifiers? No response is given by Apple's StoreKit if you pass it something invalid, it will just "not work". If you are passing it the correct product indentifier(s), how recently did you add those products? If it was within the last 24 hours then it's a good idea to leave it for a day and come back to it, sometimes StoreKit takes a will to respond to new products. Failing all that checkout this list of common problems, from the good folks at el'Apple http://developer.apple.com/library/ios/#technotes/tn2259/_index.html
-You can checkout this great post if your still getting invalid product ID's http://troybrant.net/blog/2010/01/invalid-product-ids/
+Have you checked you are passing it the correct product identifiers? No response is given by Apple's StoreKit if you pass it something invalid, it will just "not work". If you are passing it the correct product indentifier(s), how recently did you add those products? If it was within the last 24 hours then it's a good idea to leave it for a day and come back to it, sometimes StoreKit takes a will to respond to new products. Failing all that [checkout this list of common problems](http://developer.apple.com/library/ios/#technotes/tn2259/_index.html), from the good folks at el'Apple.
+You can checkout [this great post](http://troybrant.net/blog/2010/01/invalid-product-ids/) if your still getting invalid product ID's.
 
 #### 2. It won't work in the simulator? ####
 StoreKit does not work in the simulator, you must use a device to test it. Open up the underlying XCode project created by Titanium, select your connected iPhone from the left and hit "Build & Run".
