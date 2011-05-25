@@ -127,8 +127,6 @@
 
 -(void)getProducts:(id)args
 {
-	NSLog(@"Yo yo lets get the products G!");fflush(stderr);
-	
 	[self prepCallbacks:args];
 
 	NSSet *productIds = nil;
@@ -153,8 +151,6 @@
 
 -(void)makePurchase:(id)args
 {
-	NSLog(@"let's buy this bitch!");fflush(stderr);
-	
 	[self prepCallbacks:args];
 	
 	SKMutablePayment *payment = [SKMutablePayment paymentWithProductIdentifier:[args objectForKey:@"identifier"]];
@@ -224,8 +220,6 @@
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
 {
-	NSLog(@"Response from iTunes Connect.");fflush(stderr);
-	
 	if (winCallback)
 	{
 		NSMutableArray* products = [NSMutableArray array];

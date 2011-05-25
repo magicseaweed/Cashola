@@ -128,6 +128,18 @@ var Cashola = (function () {
 		loadingView.visible = false;
 		loadingView = false;
 	};
+	
+	var extend = function (obj) {
+		for (var i = 1; i < arguments.length; i++) {
+			for (var prop in arguments[i]) {
+				if (arguments[i].hasOwnProperty(prop)) {
+					obj[prop] = arguments[i][prop];
+				}
+			}
+		}
+		
+		return obj;
+	};
 
 	return {
 		createProductTableViewRow: function (product, hasPurchased) {
@@ -283,7 +295,32 @@ var Cashola = (function () {
 			
 			newWin.add(text);
 			
+			var restoreBtn = Cashola.createRestoreCompletedTransactionsButton();
+			newWin.add(restoreBtn);
+			
+			setTimeout(function () {
+				restoreBtn.top = text.top + text.height + 20;
+			}, 100);
+
 			return newWin;
+		},
+		createRestoreCompletedTransactionsButton: function (opts) {
+			var o = extend({
+				top: 20,
+				left: 20,
+				right: 20,
+				width: 280,
+				height: 34,
+				title: "Restore Previous Purchases"
+			}, opts || {});
+			
+			var restoreAll = Ti.UI.createButton(o); 
+			
+			restoreAll.addEventListener("click", function () {
+				alert("now restore everything...");
+			});
+			
+			return restoreAll;
 		},
 		startCheckout: function (opts) {
 			opts = opts || {};
