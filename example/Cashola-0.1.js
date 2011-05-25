@@ -1,78 +1,6 @@
-// this sets the background color of the master UIView (when there are no windows/tab groups on it)
-Titanium.UI.setBackgroundColor('#000');
-
-// create tab group
-var tabGroup = Titanium.UI.createTabGroup();
-
-
-//
-// create base UI tab and root window
-//
-var win1 = Titanium.UI.createWindow({  
-    title:'Tab 1',
-    backgroundColor:'#fff'
-});
-var tab1 = Titanium.UI.createTab({  
-    icon:'KS_nav_views.png',
-    title:'Tab 1',
-    window:win1
-});
-
-var label1 = Titanium.UI.createButton({
-	top: 100,
-	left: 20,
-	right: 20,
-	color:'#222',
-	title:'Start Checkout Flow',
-	textAlign:'center',
-	height: 34
-});
-
-label1.addEventListener("click", function (e) {
-	Cashola.startCheckout({
-		restoreDetails: "You should do this stuff to restore your purchases."
-	});
-});
-
-win1.add(label1);
-
-//
-// create controls tab and root window
-//
-var win2 = Titanium.UI.createWindow({  
-    title:'Tab 2',
-    backgroundColor:'#fff'
-});
-var tab2 = Titanium.UI.createTab({  
-    icon:'KS_nav_ui.png',
-    title:'Tab 2',
-    window:win2
-});
-
-var label2 = Titanium.UI.createLabel({
-	color:'#999',
-	text:'I am Window 2',
-	font:{fontSize:20,fontFamily:'Helvetica Neue'},
-	textAlign:'center',
-	width:'auto'
-});
-
-win2.add(label2);
-
-
-
-//
-//  add tabs
-//
-tabGroup.addTab(tab1);  
-tabGroup.addTab(tab2);  
-
-
-// open tab group
-tabGroup.open();
-
 var Cashola = (function () {
-	var loadingView = false;
+	var _cashola = require('com.cashola'),
+		loadingView = false;
 
 	var showLoadingView = function (win, opts) {
 		opts = opts || {};
@@ -126,10 +54,22 @@ var Cashola = (function () {
 	
 	var hideLoadingView = function (opts) {
 		loadingView.visible = false;
+		loadingView = false;
 	};
 
 	return {
-		createProductTableViewRow: function (product, hasPurchased) {
+		extend: function (obj) {
+			for (var i = 1; i < arguments.length; i++) {
+				for (var prop in arguments[i]) {
+					if (arguments[i].hasOwnProperty(prop)) {
+						obj[prop] = arguments[i][prop];
+					}
+				}
+			}
+			
+			return obj;
+		},
+		createProductTableViewRow: function (product, hasPurchased) {		
 			var row = Ti.UI.createTableViewRow({
 				hasChild: !hasPurchased ? true : false,
 				hasCheck: hasPurchased ? true : false,
@@ -165,7 +105,11 @@ var Cashola = (function () {
 			
 			return row;
 		},
-		createProductDetailWindow: function (product) {
+		createProductDetailWindow: function (product, opts) {
+			var o = Cashola.extend({
+				uidebug: true
+			}, opts || {});
+			
 			var newWin = Ti.UI.createWindow({
 				title: product.title,
 				backgroundColor: "#fff"
@@ -210,7 +154,40 @@ var Cashola = (function () {
 			});
 			
 			buyButton.addEventListener("click", function (e) {
-				alert("BUY DA PROD: "+product.title+" IDEN: "+product.identifier);
+				showLoadingView(newWin, { message: "Purchasing..." });
+
+				if (!o.uidebug) {
+					_cashola.buyProduct({
+						identifier: product.identifier,
+						win: function (e) {
+							if (e.response.state == "PaymentTransactionStatePurchased") {
+								o.win(e.response);
+							} else if (e.response.state == "PaymentTransactionStateRestored") {
+								o.win(e.response);
+							}
+							
+							hideLoadingView();
+						},
+						fail: function (e) {
+							hideLoadingView();
+							Ti.UI.createAlertDialog({ title: "Purchase Failed", message: "Unable to make purchase, reason: "+e.error.message }).show();
+							o.error({
+								code: e.response.code,
+								message: e.response.message,
+								product: product
+							});
+						}
+					});
+				} else {
+					hideLoadingView();
+					// Fake purchase callback.
+					o.win({
+						state: "PaymentTransactionStatePurchased",
+						identifier: "com.magicseaweed.pro",
+						receipt: "kdshfljdsnoivbnoifdslkfjdlksf",
+						transactionIdentifier: "dsfdsfds"
+					});
+				}
 			});
 			
 			container.add(buyButton);
@@ -245,6 +222,10 @@ var Cashola = (function () {
 			return false;
 		},
 		createRestoreWindow: function (products, opts) {
+			var o = Cashola.extend({
+				uidebug: true
+			}, opts || {});
+		
 			var newWin = Ti.UI.createWindow({
 				title: "Restore/Transfer Purchase",
 				backgroundColor: "#fff"
@@ -264,10 +245,80 @@ var Cashola = (function () {
 			
 			newWin.add(text);
 			
+			var restoreBtn = Cashola.createRestoreCompletedTransactionsButton(o);
+			newWin.add(restoreBtn);
+			
+			setTimeout(function () {
+				restoreBtn.top = text.top + text.height + 20;
+			}, 100);
+
 			return newWin;
 		},
+		createRestoreCompletedTransactionsButton: function (opts) {
+			var o = Cashola.extend({
+				uidebug: true,
+				top: 20,
+				left: 20,
+				right: 20,
+				width: 280,
+				height: 34,
+				title: "Restore Previous Purchases"
+			}, opts || {});
+			
+			var restoreAll = Ti.UI.createButton(o); 
+			
+			restoreAll.addEventListener("click", function () {
+				//alert("now restore everything...");
+				if (!o.uidebug) {
+					_cashola.restoreTransactions({
+						win: function (p) {
+							Ti.API.debug("some stuff was restored?");
+						}
+					});
+				} else {
+					Ti.API.debug("some stuff was restored?");
+				}
+			});
+			
+			return restoreAll;
+		},
+		createStoreWindow: function (opts) {
+			return Ti.UI.createWindow({
+				title: "Store"
+			});
+		},
+		createStoreTableView: function () {
+			return Ti.UI.createTableView({
+				data: [],
+				style: Ti.UI.iPhone.TableViewStyle.GROUPED
+			});
+		},
 		startCheckout: function (opts) {
-			opts = opts || {};
+			var o = Cashola.extend({
+				// Should we use the cashola module or just fake the data so we can test the UI quicker.
+				uidebug: true,
+				
+				// Products that can be purchased, accepts string or array.
+				identifiers: "com.my.product",
+				
+				// Default function to render restore window, is passed products array.
+				createRestoreWindow: Cashola.createRestoreWindow,
+				
+				// Default function to render product detail window, is passed the product.
+				createProductDetailWindow: Cashola.createProductDetailWindow,
+				
+				// Array of already purchased product identifiers.
+				purchased: [],
+				
+				// Callback when a product is purchased.
+				win: function () { },
+				
+				// Callback when the checkout is closed.
+				closed: function () { },
+				
+				// Callback when there is an error.
+				error: function () { }
+			}, opts || {});
 		
 			var products = false;
 			
@@ -275,14 +326,9 @@ var Cashola = (function () {
 				navBarHidden: true
 			});
 			
-			var storeWin = Ti.UI.createWindow({
-				title: "Store"
-			});
+			var storeWin = Cashola.createStoreWindow();
 			
-			var tableView = Ti.UI.createTableView({
-				data: [],
-				style: Ti.UI.iPhone.TableViewStyle.GROUPED
-			});
+			var tableView = Cashola.createStoreTableView();
 			
 			storeWin.add(tableView);
 			
@@ -305,7 +351,7 @@ var Cashola = (function () {
 				}));
 				
 				for (var i = 0; i < e.products.length; i++) {
-					data[0].add(Cashola.createProductTableViewRow(e.products[i], Cashola.hasPurchasedProduct(e.products[i].identifier, opts.purchased)));
+					data[0].add(Cashola.createProductTableViewRow(e.products[i], Cashola.hasPurchasedProduct(e.products[i].identifier, o.purchased)));
 				}
 				
 				tableView.setData(data);
@@ -313,10 +359,10 @@ var Cashola = (function () {
 			
 			tableView.addEventListener("click", function (e) {
 				if (e.rowData.restore === true) {					
-					var newWin = opts.createRestoreWindow || Cashola.createRestoreWindow(products, opts);
+					var newWin = o.createRestoreWindow(products, o);
 					nav.open(newWin);
 				} else {
-					var newWin = opts.createProductDetailWindow || Cashola.createProductDetailWindow(products[e.index]);
+					var newWin = o.createProductDetailWindow(products[e.index], o);
 					nav.open(newWin);
 				}
 			});
@@ -329,6 +375,7 @@ var Cashola = (function () {
 			
 			done.addEventListener("click", function (e) {
 				modal.close();
+				o.closed();
 			});
 		
 			var nav = Ti.UI.iPhone.createNavigationGroup({
@@ -340,25 +387,34 @@ var Cashola = (function () {
 				modal: true
 			});
 			
-			/*
 			showLoadingView(storeWin, { message: "Retrieving..." });
-			Ti.API.getProducts({
-				identifiers: "com.magicseaweed.pro",
-				win: function (e) {						
-					gotProducts(e);
-					hideLoadingView();
-					retrieved = true;
-				}
-			});
-			*/
-			gotProducts({
-				products: [{
-					identifier: "com.magicseaweed.pro",
-					title: "Some stuff",
-					description: "blah, blah, blah",
-					price: "$1.99"
-				}]
-			});
+			if (!o.uidebug) {
+				_cashola.getProducts({
+					identifiers: "com.magicseaweed.pro",
+					win: function (e) {						
+						gotProducts(e);
+						hideLoadingView();
+						retrieved = true;
+					},
+					fail: function (e) {
+						o.error({
+							code: 101,
+							message: "Invalid product ID's specified.",
+							products: e.failed
+						});
+					}
+				});
+			} else {
+				gotProducts({
+					products: [{
+						identifier: "com.myapp.test.the.ui",
+						title: "Some stuff",
+						description: "blah, blah, blah",
+						price: "$1.99"
+					}]
+				});
+				hideLoadingView();
+			}
 		}
 	};
 })();

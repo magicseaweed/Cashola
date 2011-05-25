@@ -1,18 +1,29 @@
-/**
- * Your Copyright Here
- *
- * Appcelerator Titanium is Copyright (c) 2009-2010 by Appcelerator, Inc.
- * and licensed under the Apache Public License (version 2)
- */
+//
+// ComCasholaModule.m
+//
+// Copyright Metcentral Ltd 2011
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #import "ComCasholaModule.h"
 #import "TiBase.h"
 #import "TiHost.h"
 #import "TiUtils.h"
-#import "SKProduct+LocalizedPrice.h"
 
 // Private
 @interface ComCasholaModule()
 -(void)prepCallbacks:(id)args;
+-(NSString *)localizedPrice:(SKProduct *)product;
 @end
 
 @implementation ComCasholaModule
@@ -109,17 +120,17 @@
 	if (win != nil) 
 	{
 		ENSURE_TYPE(win, KrollCallback); // Verifies type.
-		winCallback = win;
+		winCallback = [win retain];
 	}	
 	if (fail != nil)
 	{
 		ENSURE_TYPE(fail, KrollCallback); // Verifies type.
-		failCallback = fail;
+		failCallback = [fail retain];
 	}
 	if (error != nil)
 	{
 		ENSURE_TYPE(error, KrollCallback); // Verifies type.
-		errorCallback = error;
+		errorCallback = [error retain];
 	}
 }
 
@@ -128,7 +139,13 @@
 -(void)getProducts:(id)args
 {
 	[self prepCallbacks:args];
-
+	ENSURE_SINGLE_ARG(args, NSDictionary);
+	
+	if (![SKPaymentQueue canMakePayments]) {
+		NSLog(@"Cannot purchase products?");fflush(stderr);
+	}
+	
+	
 	NSSet *productIds = nil;
 	id ids = [args objectForKey:@"identifiers"];
 	if ([ids isKindOfClass:[NSString class]])
@@ -144,14 +161,15 @@
 		[self throwException:TiExceptionInvalidType subreason:[NSString stringWithFormat:@"Cashola.getProducts.identifiers must be passed: Array or String, was: %@", [ids class]] location:CODELOCATION];
 	}
 	
-	SKProductsRequest *req = [[[SKProductsRequest alloc] initWithProductIdentifiers:productIds] autorelease];
+	SKProductsRequest *req = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject: @"com.magicseaweed.pro"]];
 	req.delegate = self;
 	[req start];
 }
 
--(void)makePurchase:(id)args
-{
+-(void)buyProduct:(id)args
+{	
 	[self prepCallbacks:args];
+	ENSURE_SINGLE_ARG(args, NSDictionary);
 	
 	SKMutablePayment *payment = [SKMutablePayment paymentWithProductIdentifier:[args objectForKey:@"identifier"]];
 	
@@ -160,7 +178,32 @@
 		payment.quantity = [quantity integerValue];
 	}
 	
+	[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
 	[[SKPaymentQueue defaultQueue] addPayment:payment];
+}
+
+-(void)restoreTransactions:(id)args
+{
+	NSLog(@"restore all products!");fflush(stderr);
+	
+	[self prepCallbacks:args];
+	
+	[[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+	[[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+}
+
+#pragma mark Private Parts
+
+-(NSString *)localizedPrice:(SKProduct *)product
+{
+    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+    [numberFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+    [numberFormatter setNumberStyle:NSNumberFormatterCurrencyStyle];
+    [numberFormatter setLocale:product.priceLocale];
+    NSString *formattedString = [numberFormatter stringFromNumber:product.price];
+    [numberFormatter release];
+	
+    return formattedString;
 }
 
 #pragma mark Delegates
@@ -174,7 +217,7 @@
 			case SKPaymentTransactionStatePurchased:
 				[response setObject:@"PaymentTransactionStatePurchased" forKey:@"state"];
 				[response setObject:transaction.transactionIdentifier forKey:@"transactionIdentifier"];
-				[response setObject:[[transaction transactionReceipt] base64EncodedString] forKey:@"receipt"];
+				[response setObject:[Base64 encode:transaction.transactionReceipt] forKey:@"receipt"];
 				[response setObject:transaction.payment.productIdentifier forKey:@"identifier"];
 				
 				if (winCallback)
@@ -183,23 +226,25 @@
 					[self _fireEventToListener:@"win" withObject:event listener:winCallback thisObject:nil];
 				}
 				
+				[[SKPaymentQueue defaultQueue] finishTransaction:transaction]; // Duplicated, but only do if state is correct/matched.
 				break;
 			case SKPaymentTransactionStateFailed:
 				[response setObject:@"PaymentTransactionStateFailed" forKey:@"state"];
-				[response setObject:transaction.error.localizedDescription forKey:@"error"];
+				[response setObject:transaction.error.localizedDescription forKey:@"message"];
 				[response setObject:[NSNumber numberWithInteger:transaction.error.code] forKey:@"code"];
 				
 				if (failCallback)
 				{
 					NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:response, @"error", nil];
-					[self _fireEventToListener:@"win" withObject:event listener:failCallback thisObject:nil];
+					[self _fireEventToListener:@"fail" withObject:event listener:failCallback thisObject:nil];
 				}
 				
+				[[SKPaymentQueue defaultQueue] finishTransaction:transaction]; // Duplicated, but only do if state is correct/matched.
 				break;
 			case SKPaymentTransactionStateRestored:
-				[response setObject:@"SKPaymentTransactionStateRestored" forKey:@"state"];
-				[response setObject:transaction.originalTransaction.transactionIdentifier forKey:@"identifier"];
-				[response setObject:[[[transaction originalTransaction] transactionReceipt] base64EncodedString] forKey:@"receipt"];
+				[response setObject:@"PaymentTransactionStateRestored" forKey:@"state"];
+				[response setObject:transaction.originalTransaction.transactionIdentifier forKey:@"transactionIdentifier"];
+				[response setObject:[Base64 encode:[[transaction originalTransaction] transactionReceipt]] forKey:@"receipt"];
 				[response setObject:transaction.originalTransaction.payment.productIdentifier forKey:@"identifier"];
 				
 				if (winCallback)
@@ -208,23 +253,26 @@
 					[self _fireEventToListener:@"win" withObject:event listener:winCallback thisObject:nil];
 				}
 				
+				[[SKPaymentQueue defaultQueue] finishTransaction:transaction]; // Duplicated, but only do if state is correct/matched.
 				break;
-
+				
 			default:
 				break;
 		}
-		
-		[[SKPaymentQueue defaultQueue] finishTransaction:transaction];
 	}
 }
 
-- (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
-{
+- (void)paymentQueue:(SKPaymentQueue *)queue removedTransactions:(NSArray *)transactions
+{ 
+}
+
+- (void) productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
+{	
 	if (winCallback)
 	{
 		NSMutableArray* products = [NSMutableArray array];
 		for (SKProduct* product in response.products) {
-			[products addObject:[NSDictionary dictionaryWithObjectsAndKeys:product.productIdentifier, @"identifier", product.localizedTitle, @"title", product.localizedDescription, @"description", [product localizedPrice], @"price"]];
+			[products addObject:[NSDictionary dictionaryWithObjectsAndKeys:product.productIdentifier, @"identifier", product.localizedTitle, @"title", product.localizedDescription, @"description", [self localizedPrice:product], @"price", nil]];
 		}
 		NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:products, @"products", nil];
 		[self _fireEventToListener:@"win" withObject:event listener:winCallback thisObject:nil];
@@ -237,6 +285,26 @@
 			[failed addObject:invalidProductId];
 		}
 		NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:failed, @"failed", nil];
+		[self _fireEventToListener:@"fail" withObject:event listener:failCallback thisObject:nil];
+	}
+}
+
+-(void)request:(SKRequest *)request didFailWithError:(NSError *)error  
+{  
+    NSLog(@"Failed to connect with error: %@", [error localizedDescription]);fflush(stderr);
+}
+
+- (void)paymentQueueRestoreCompletedTransactionsFinished:(SKPaymentQueue *)queue
+{
+	NSLog(@"payments restored...");fflush(stderr);
+}
+
+- (void)paymentQueue:(SKPaymentQueue *)queue restoreCompletedTransactionsFailedWithError:(NSError *)error
+{
+	if (failCallback)
+	{
+		NSDictionary *e = [NSDictionary dictionaryWithObjectsAndKeys:error.code, @"code", error.localizedDescription, @"message", nil];
+		NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:e, @"error", nil];
 		[self _fireEventToListener:@"fail" withObject:event listener:failCallback thisObject:nil];
 	}
 }

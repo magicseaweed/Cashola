@@ -26,11 +26,11 @@
 		24DD6CFA1134B3F500162E58 /* ComCasholaModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DD6CF81134B3F500162E58 /* ComCasholaModule.m */; };
 		24DE9E1111C5FE74003F90F6 /* ComCasholaModuleAssets.h in Headers */ = {isa = PBXBuildFile; fileRef = 24DE9E0F11C5FE74003F90F6 /* ComCasholaModuleAssets.h */; };
 		24DE9E1211C5FE74003F90F6 /* ComCasholaModuleAssets.m in Sources */ = {isa = PBXBuildFile; fileRef = 24DE9E1011C5FE74003F90F6 /* ComCasholaModuleAssets.m */; };
+		528BF5BD138D31080079CFBA /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 528BF5BB138D31080079CFBA /* Base64.h */; };
+		528BF5BE138D31080079CFBA /* Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 528BF5BC138D31080079CFBA /* Base64.m */; };
 		AA747D9F0F9514B9006C5449 /* ComCashola_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = AA747D9E0F9514B9006C5449 /* ComCashola_Prefix.pch */; };
 		AACBBE4A0F95108600F1A2B1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AACBBE490F95108600F1A2B1 /* Foundation.framework */; };
 		BA2B23F313758D3400A0B374 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BA2B23F213758D3400A0B374 /* StoreKit.framework */; };
-		BAFC48AC1375ADB000C66898 /* SKProduct+LocalizedPrice.h in Headers */ = {isa = PBXBuildFile; fileRef = BAFC48AA1375ADB000C66898 /* SKProduct+LocalizedPrice.h */; };
-		BAFC48AD1375ADB000C66898 /* SKProduct+LocalizedPrice.m in Sources */ = {isa = PBXBuildFile; fileRef = BAFC48AB1375ADB000C66898 /* SKProduct+LocalizedPrice.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,11 +49,11 @@
 		24DD6D1B1134B66800162E58 /* titanium.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = titanium.xcconfig; sourceTree = "<group>"; };
 		24DE9E0F11C5FE74003F90F6 /* ComCasholaModuleAssets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ComCasholaModuleAssets.h; path = Classes/ComCasholaModuleAssets.h; sourceTree = "<group>"; };
 		24DE9E1011C5FE74003F90F6 /* ComCasholaModuleAssets.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ComCasholaModuleAssets.m; path = Classes/ComCasholaModuleAssets.m; sourceTree = "<group>"; };
+		528BF5BB138D31080079CFBA /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
+		528BF5BC138D31080079CFBA /* Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Base64.m; sourceTree = "<group>"; };
 		AA747D9E0F9514B9006C5449 /* ComCashola_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ComCashola_Prefix.pch; sourceTree = SOURCE_ROOT; };
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		BA2B23F213758D3400A0B374 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		BAFC48AA1375ADB000C66898 /* SKProduct+LocalizedPrice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SKProduct+LocalizedPrice.h"; path = "Classes/SKProduct+LocalizedPrice.h"; sourceTree = "<group>"; };
-		BAFC48AB1375ADB000C66898 /* SKProduct+LocalizedPrice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "SKProduct+LocalizedPrice.m"; path = "Classes/SKProduct+LocalizedPrice.m"; sourceTree = "<group>"; };
 		D2AAC07E0554694100DB518D /* libComCashola.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libComCashola.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -101,12 +101,12 @@
 		08FB77AEFE84172EC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				BAFC48AA1375ADB000C66898 /* SKProduct+LocalizedPrice.h */,
-				BAFC48AB1375ADB000C66898 /* SKProduct+LocalizedPrice.m */,
 				24DE9E0F11C5FE74003F90F6 /* ComCasholaModuleAssets.h */,
 				24DE9E1011C5FE74003F90F6 /* ComCasholaModuleAssets.m */,
 				24DD6CF71134B3F500162E58 /* ComCasholaModule.h */,
 				24DD6CF81134B3F500162E58 /* ComCasholaModule.m */,
+				528BF5BB138D31080079CFBA /* Base64.h */,
+				528BF5BC138D31080079CFBA /* Base64.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -130,7 +130,7 @@
 				AA747D9F0F9514B9006C5449 /* ComCashola_Prefix.pch in Headers */,
 				24DD6CF91134B3F500162E58 /* ComCasholaModule.h in Headers */,
 				24DE9E1111C5FE74003F90F6 /* ComCasholaModuleAssets.h in Headers */,
-				BAFC48AC1375ADB000C66898 /* SKProduct+LocalizedPrice.h in Headers */,
+				528BF5BD138D31080079CFBA /* Base64.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,7 +203,7 @@
 			files = (
 				24DD6CFA1134B3F500162E58 /* ComCasholaModule.m in Sources */,
 				24DE9E1211C5FE74003F90F6 /* ComCasholaModuleAssets.m in Sources */,
-				BAFC48AD1375ADB000C66898 /* SKProduct+LocalizedPrice.m in Sources */,
+				528BF5BE138D31080079CFBA /* Base64.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

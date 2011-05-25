@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-<id>com.magicseaweed</id>
+<id>com.my.app</id>
 <name>CasholaExampleApp</name>
 <version>1.0</version>
 <publisher>Metcentral Ltd</publisher>
