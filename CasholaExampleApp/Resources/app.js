@@ -30,7 +30,18 @@ var label1 = Titanium.UI.createButton({
 
 label1.addEventListener("click", function (e) {
 	Cashola.startCheckout({
-		restoreDetails: "You should do this stuff to restore your purchases."
+		uidebug: true,
+		identifiers: ["com.magicseaweed.pro"],
+		restoreDetails: "You should do this stuff to restore your purchases.",
+		win: function (product) {
+			alert("Cashola.startCheckout.win - made purchase");
+		},
+		closed: function () { // Called when the checkout ends.
+			alert("Cashola.startCheckout.closed");
+		},
+		error: function (e) { // There was an error.
+			alert("Cashola.startCheckout.error");
+		}
 	});
 });
 
@@ -128,21 +139,20 @@ var Cashola = (function () {
 		loadingView.visible = false;
 		loadingView = false;
 	};
-	
-	var extend = function (obj) {
-		for (var i = 1; i < arguments.length; i++) {
-			for (var prop in arguments[i]) {
-				if (arguments[i].hasOwnProperty(prop)) {
-					obj[prop] = arguments[i][prop];
-				}
-			}
-		}
-		
-		return obj;
-	};
 
 	return {
-		createProductTableViewRow: function (product, hasPurchased) {
+		extend: function (obj) {
+			for (var i = 1; i < arguments.length; i++) {
+				for (var prop in arguments[i]) {
+					if (arguments[i].hasOwnProperty(prop)) {
+						obj[prop] = arguments[i][prop];
+					}
+				}
+			}
+			
+			return obj;
+		},
+		createProductTableViewRow: function (product, hasPurchased) {		
 			var row = Ti.UI.createTableViewRow({
 				hasChild: !hasPurchased ? true : false,
 				hasCheck: hasPurchased ? true : false,
@@ -178,7 +188,11 @@ var Cashola = (function () {
 			
 			return row;
 		},
-		createProductDetailWindow: function (product) {
+		createProductDetailWindow: function (product, opts) {
+			var o = Cashola.extend({
+				uidebug: true
+			}, opts || {});
+			
 			var newWin = Ti.UI.createWindow({
 				title: product.title,
 				backgroundColor: "#fff"
@@ -224,24 +238,39 @@ var Cashola = (function () {
 			
 			buyButton.addEventListener("click", function (e) {
 				showLoadingView(newWin, { message: "Purchasing..." });
-				/*
-				Ti.API.buyProduct({
-					identifier: product.identifier,
-					win: function (e) {
-						if (e.state == "PaymentTransactionStatePurchased") {
-							alert("BOOM, new purchase.");
-						} else if (e.state == "PaymentTransactionStateRestored") {
-							alert("restored payment.");
+
+				if (!o.uidebug) {
+					Ti.API.buyProduct({
+						identifier: product.identifier,
+						win: function (e) {
+							if (e.response.state == "PaymentTransactionStatePurchased") {
+								o.win(e.response);
+							} else if (e.response.state == "PaymentTransactionStateRestored") {
+								o.win(e.response);
+							}
+							
+							hideLoadingView();
+						},
+						fail: function (e) {
+							hideLoadingView();
+							Ti.UI.createAlertDialog({ title: "Purchase Failed", message: "Unable to make purchase, reason: "+e.error.message }).show();
+							o.error({
+								code: e.response.code,
+								message: e.response.message,
+								product: product
+							});
 						}
-						
-						hideLoadingView();
-					},
-					fail: function (e) {
-						hideLoadingView();
-						alert("It didn't work, code: "+e.code);
-					}
-				});
-				*/
+					});
+				} else {
+					hideLoadingView();
+					// Fake purchase callback.
+					o.win({
+						state: "PaymentTransactionStatePurchased",
+						identifier: "com.magicseaweed.pro",
+						receipt: "kdshfljdsnoivbnoifdslkfjdlksf",
+						transactionIdentifier: "dsfdsfds"
+					});
+				}
 			});
 			
 			container.add(buyButton);
@@ -276,6 +305,10 @@ var Cashola = (function () {
 			return false;
 		},
 		createRestoreWindow: function (products, opts) {
+			var o = Cashola.extend({
+				uidebug: true
+			}, opts || {});
+		
 			var newWin = Ti.UI.createWindow({
 				title: "Restore/Transfer Purchase",
 				backgroundColor: "#fff"
@@ -295,7 +328,7 @@ var Cashola = (function () {
 			
 			newWin.add(text);
 			
-			var restoreBtn = Cashola.createRestoreCompletedTransactionsButton();
+			var restoreBtn = Cashola.createRestoreCompletedTransactionsButton(o);
 			newWin.add(restoreBtn);
 			
 			setTimeout(function () {
@@ -305,7 +338,8 @@ var Cashola = (function () {
 			return newWin;
 		},
 		createRestoreCompletedTransactionsButton: function (opts) {
-			var o = extend({
+			var o = Cashola.extend({
+				uidebug: true,
 				top: 20,
 				left: 20,
 				right: 20,
@@ -317,13 +351,57 @@ var Cashola = (function () {
 			var restoreAll = Ti.UI.createButton(o); 
 			
 			restoreAll.addEventListener("click", function () {
-				alert("now restore everything...");
+				//alert("now restore everything...");
+				if (!o.uidebug) {
+					Ti.API.restoreTransactions({
+						win: function (p) {
+							Ti.API.debug("some stuff was restored?");
+						}
+					});
+				} else {
+					Ti.API.debug("some stuff was restored?");
+				}
 			});
 			
 			return restoreAll;
 		},
+		createStoreWindow: function (opts) {
+			return Ti.UI.createWindow({
+				title: "Store"
+			});
+		},
+		createStoreTableView: function () {
+			return Ti.UI.createTableView({
+				data: [],
+				style: Ti.UI.iPhone.TableViewStyle.GROUPED
+			});
+		},
 		startCheckout: function (opts) {
-			opts = opts || {};
+			var o = Cashola.extend({
+				// Should we use the cashola module or just fake the data so we can test the UI quicker.
+				uidebug: true,
+				
+				// Products that can be purchased, accepts string or array.
+				identifiers: "com.magicseaweed.pro",
+				
+				// Default function to render restore window, is passed products array.
+				createRestoreWindow: Cashola.createRestoreWindow,
+				
+				// Default function to render product detail window, is passed the product.
+				createProductDetailWindow: Cashola.createProductDetailWindow,
+				
+				// Array of already purchased product identifiers.
+				purchased: [],
+				
+				// Callback when a product is purchased.
+				win: function () { },
+				
+				// Callback when the checkout is closed.
+				closed: function () { },
+				
+				// Callback when there is an error.
+				error: function () { }
+			}, opts || {});
 		
 			var products = false;
 			
@@ -331,14 +409,9 @@ var Cashola = (function () {
 				navBarHidden: true
 			});
 			
-			var storeWin = Ti.UI.createWindow({
-				title: "Store"
-			});
+			var storeWin = Cashola.createStoreWindow();
 			
-			var tableView = Ti.UI.createTableView({
-				data: [],
-				style: Ti.UI.iPhone.TableViewStyle.GROUPED
-			});
+			var tableView = Cashola.createStoreTableView();
 			
 			storeWin.add(tableView);
 			
@@ -361,7 +434,7 @@ var Cashola = (function () {
 				}));
 				
 				for (var i = 0; i < e.products.length; i++) {
-					data[0].add(Cashola.createProductTableViewRow(e.products[i], Cashola.hasPurchasedProduct(e.products[i].identifier, opts.purchased)));
+					data[0].add(Cashola.createProductTableViewRow(e.products[i], Cashola.hasPurchasedProduct(e.products[i].identifier, o.purchased)));
 				}
 				
 				tableView.setData(data);
@@ -369,10 +442,10 @@ var Cashola = (function () {
 			
 			tableView.addEventListener("click", function (e) {
 				if (e.rowData.restore === true) {					
-					var newWin = opts.createRestoreWindow || Cashola.createRestoreWindow(products, opts);
+					var newWin = o.createRestoreWindow(products, o);
 					nav.open(newWin);
 				} else {
-					var newWin = opts.createProductDetailWindow || Cashola.createProductDetailWindow(products[e.index]);
+					var newWin = o.createProductDetailWindow(products[e.index], o);
 					nav.open(newWin);
 				}
 			});
@@ -385,6 +458,7 @@ var Cashola = (function () {
 			
 			done.addEventListener("click", function (e) {
 				modal.close();
+				o.closed();
 			});
 		
 			var nav = Ti.UI.iPhone.createNavigationGroup({
@@ -397,24 +471,33 @@ var Cashola = (function () {
 			});
 			
 			showLoadingView(storeWin, { message: "Retrieving..." });
-			/*Ti.API.getProducts({
-				identifiers: "com.magicseaweed.pro",
-				win: function (e) {						
-					gotProducts(e);
-					hideLoadingView();
-					retrieved = true;
-				}
-			});*/
-
-			gotProducts({
-				products: [{
-					identifier: "com.myapp.test.the.ui",
-					title: "Some stuff",
-					description: "blah, blah, blah",
-					price: "$1.99"
-				}]
-			});
-			hideLoadingView();
+			if (!o.uidebug) {
+				Ti.API.getProducts({
+					identifiers: "com.magicseaweed.pro",
+					win: function (e) {						
+						gotProducts(e);
+						hideLoadingView();
+						retrieved = true;
+					},
+					fail: function (e) {
+						o.error({
+							code: 101,
+							message: "Invalid product ID's specified.",
+							products: e.failed
+						});
+					}
+				});
+			} else {
+				gotProducts({
+					products: [{
+						identifier: "com.myapp.test.the.ui",
+						title: "Some stuff",
+						description: "blah, blah, blah",
+						price: "$1.99"
+					}]
+				});
+				hideLoadingView();
+			}
 		}
 	};
 })();
