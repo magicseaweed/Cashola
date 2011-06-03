@@ -1,4 +1,5 @@
 // IMPORTANT: Will not working until you include Cashola.js file.
+Ti.include("Cashola-0.1.js");
 
 // this sets the background color of the master UIView (when there are no windows/tab groups on it)
 Titanium.UI.setBackgroundColor('#000');
@@ -33,15 +34,17 @@ var label1 = Titanium.UI.createButton({
 label1.addEventListener("click", function (e) {
 	Cashola.startCheckout({
 		uidebug: false,
-		identifiers: ["com.magicseaweed.pro"],
+		identifiers: ["com.magicseaweed.pro", "com.magicseaweed.pro.1month", "com.magicseaweed.stormrider", "com.magicseaweed.pro.1year"],
 		restoreDetails: "You should do this stuff to restore your purchases.",
-		win: function (product) {
+		win: function (purchased) {
+			Ti.API.debug(purchased);
 			alert("Cashola.startCheckout.win - made purchase");
 		},
 		closed: function () { // Called when the checkout ends.
 			alert("Cashola.startCheckout.closed");
 		},
 		error: function (e) { // There was an error.
+			Ti.API.debug(e);
 			alert("Cashola.startCheckout.error");
 		}
 	});

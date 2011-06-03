@@ -161,7 +161,7 @@
 		[self throwException:TiExceptionInvalidType subreason:[NSString stringWithFormat:@"Cashola.getProducts.identifiers must be passed: Array or String, was: %@", [ids class]] location:CODELOCATION];
 	}
 	
-	SKProductsRequest *req = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject: @"com.magicseaweed.pro"]];
+	SKProductsRequest *req = [[SKProductsRequest alloc] initWithProductIdentifiers:productIds];
 	req.delegate = self;
 	[req start];
 }
@@ -210,6 +210,9 @@
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {	
+	NSMutableArray *purchased = [[[NSMutableArray alloc] init] autorelease];
+	NSMutableArray *failed = [[[NSMutableArray alloc] init] autorelease];
+	
 	for (SKPaymentTransaction *transaction in transactions) {
 		NSMutableDictionary *response = [[[NSMutableDictionary alloc] init] autorelease];
 		
@@ -220,10 +223,9 @@
 				[response setObject:[Base64 encode:transaction.transactionReceipt] forKey:@"receipt"];
 				[response setObject:transaction.payment.productIdentifier forKey:@"identifier"];
 				
-				if (winCallback)
+				if ([purchased indexOfObjectIdenticalTo:response] == NSNotFound)
 				{
-					NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:response, @"response", nil];
-					[self _fireEventToListener:@"win" withObject:event listener:winCallback thisObject:nil];
+					[purchased addObject:response];
 				}
 				
 				[[SKPaymentQueue defaultQueue] finishTransaction:transaction]; // Duplicated, but only do if state is correct/matched.
@@ -233,10 +235,9 @@
 				[response setObject:transaction.error.localizedDescription forKey:@"message"];
 				[response setObject:[NSNumber numberWithInteger:transaction.error.code] forKey:@"code"];
 				
-				if (failCallback)
+				if ([failed indexOfObjectIdenticalTo:response] == NSNotFound)
 				{
-					NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:response, @"error", nil];
-					[self _fireEventToListener:@"fail" withObject:event listener:failCallback thisObject:nil];
+					[failed addObject:response];
 				}
 				
 				[[SKPaymentQueue defaultQueue] finishTransaction:transaction]; // Duplicated, but only do if state is correct/matched.
@@ -244,13 +245,12 @@
 			case SKPaymentTransactionStateRestored:
 				[response setObject:@"PaymentTransactionStateRestored" forKey:@"state"];
 				[response setObject:transaction.originalTransaction.transactionIdentifier forKey:@"transactionIdentifier"];
-				[response setObject:[Base64 encode:[[transaction originalTransaction] transactionReceipt]] forKey:@"receipt"];
+				[response setObject:[Base64 encode:transaction.transactionReceipt] forKey:@"receipt"];
 				[response setObject:transaction.originalTransaction.payment.productIdentifier forKey:@"identifier"];
 				
-				if (winCallback)
+				if ([purchased indexOfObjectIdenticalTo:response] == NSNotFound)
 				{
-					NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:response, @"response", nil];
-					[self _fireEventToListener:@"win" withObject:event listener:winCallback thisObject:nil];
+					[purchased addObject:response];
 				}
 				
 				[[SKPaymentQueue defaultQueue] finishTransaction:transaction]; // Duplicated, but only do if state is correct/matched.
@@ -259,6 +259,18 @@
 			default:
 				break;
 		}
+	}
+	
+	if (winCallback && [purchased count] > 0)
+	{
+		NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:purchased, @"purchased", nil];
+		[self _fireEventToListener:@"win" withObject:event listener:winCallback thisObject:nil];
+	}
+	
+	if (failCallback && [failed count] > 0)
+	{
+		NSDictionary *event = [NSDictionary dictionaryWithObjectsAndKeys:failed, @"failed", nil];
+		[self _fireEventToListener:@"fail" withObject:event listener:failCallback thisObject:nil];
 	}
 }
 
@@ -278,7 +290,7 @@
 		[self _fireEventToListener:@"win" withObject:event listener:winCallback thisObject:nil];
 	}
 	
-	if (failCallback)
+	if (failCallback && [response.invalidProductIdentifiers count] >= 1)
 	{
 		NSMutableArray* failed = [NSMutableArray array];
 		for (NSString *invalidProductId in response.invalidProductIdentifiers) {
